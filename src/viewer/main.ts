@@ -18,16 +18,9 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
 });
 
 function renderRaw(raw: string) {
-  document.getElementById('root')!.remove();
-  document.head.innerHTML = `
-    <meta charset="UTF-8">
-    <style>
-      body { margin: 0; background: #1e1e1e; color: #d4d4d4; font-family: monospace; font-size: 13px; }
-      pre { padding: 20px; white-space: pre-wrap; word-break: break-word; }
-    </style>`;
-  const pre = document.createElement('pre');
-  pre.textContent = raw;
-  document.body.appendChild(pre);
+  document.open();
+  document.write(raw);
+  document.close();
 }
 
 function renderViewer(raw: string) {
