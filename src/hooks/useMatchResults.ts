@@ -1,76 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { API } from '../config/endpoints';
-import type { ApiMatchResult, ApiScheduleItem, MatchScore, ResultResponse, ResultsDict } from '../types/api';
+import type { ApiMatchResult, ResultResponse, ResultsDict } from '../types/api';
 
 export type RawResultsDict = Record<string, ApiMatchResult>;
 
 interface State {
   results: ResultsDict;
   rawResults: RawResultsDict;
-  loading: boolean;
   reloadingCodes: Set<string>;
   failedCodes: Set<string>;
 }
 
 interface Return extends State {
+  loadMatch: (code: string) => void;
   reloadMatch: (code: string) => Promise<boolean>;
 }
 
-export function useMatchResults(matches: ApiScheduleItem[]): Return {
+export function useMatchResults(): Return {
   const [state, setState] = useState<State>({
     results: {},
     rawResults: {},
-    loading: false,
     reloadingCodes: new Set(),
     failedCodes: new Set(),
   });
 
-  useEffect(() => {
-    const finished = matches.filter((m) => m.status.code === 'FINISHED');
-    if (finished.length === 0) return;
+  // tracks codes that have already been requested to prevent duplicate fetches
+  const requestedRef = useRef(new Set<string>());
 
-    let cancelled = false;
-    let pending = finished.length;
-
-    setState((prev) => ({ ...prev, results: {}, rawResults: {}, loading: true }));
-
-    for (const m of finished) {
-      fetch(API.resultUrl(m.code))
-        .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`${res.status}`))))
-        .then((data: ResultResponse) => {
-          if (cancelled) return;
-          pending -= 1;
-
-          const home = data.results.items.find((i) => i.sortOrder === 1);
-          const away = data.results.items.find((i) => i.sortOrder === 2);
-          if (home && away) {
-            const score: MatchScore = { home: home.resultData, away: away.resultData };
-            setState((prev) => ({
-              ...prev,
-              results: { ...prev.results, [m.code]: score },
-              rawResults: { ...prev.rawResults, [m.code]: data.results },
-              failedCodes: new Set([...prev.failedCodes].filter((c) => c !== m.code)),
-              loading: pending > 0,
-            }));
-          } else {
-            setState((prev) => ({ ...prev, loading: pending > 0 }));
-          }
-        })
-        .catch(() => {
-          if (cancelled) return;
-          pending -= 1;
-          setState((prev) => ({
-            ...prev,
-            failedCodes: new Set([...prev.failedCodes, m.code]),
-            loading: pending > 0,
-          }));
-        });
-    }
-
-    return () => { cancelled = true; };
-  }, [matches]);
-
-  function reloadMatch(code: string): Promise<boolean> {
+  function fetchResult(code: string): Promise<boolean> {
     setState((prev) => ({ ...prev, reloadingCodes: new Set([...prev.reloadingCodes, code]) }));
 
     return fetch(API.resultUrl(code))
@@ -101,5 +58,16 @@ export function useMatchResults(matches: ApiScheduleItem[]): Return {
       });
   }
 
-  return { ...state, reloadMatch };
+  function loadMatch(code: string) {
+    if (requestedRef.current.has(code)) return;
+    requestedRef.current.add(code);
+    fetchResult(code);
+  }
+
+  function reloadMatch(code: string): Promise<boolean> {
+    requestedRef.current.add(code);
+    return fetchResult(code);
+  }
+
+  return { ...state, loadMatch, reloadMatch };
 }

@@ -10,7 +10,7 @@ import MatchList from './MatchList';
 
 export default function App() {
   const { matches, events, loading, error, retry } = useOlympicsData();
-  const { results, rawResults, loading: resultsLoading, reloadingCodes, failedCodes, reloadMatch } = useMatchResults(matches);
+  const { results, rawResults, reloadingCodes, failedCodes, loadMatch, reloadMatch } = useMatchResults();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
   const filtered = matches.filter((m) => {
@@ -43,7 +43,7 @@ export default function App() {
           </div>
         )}
         {!loading && !error && (
-          <MatchList matches={filtered} events={events} results={results} rawResults={rawResults} resultsLoading={resultsLoading} reloadingCodes={reloadingCodes} failedCodes={failedCodes} reloadMatch={reloadMatch} />
+          <MatchList matches={filtered} events={events} results={results} rawResults={rawResults} reloadingCodes={reloadingCodes} failedCodes={failedCodes} loadMatch={loadMatch} reloadMatch={reloadMatch} />
         )}
       </main>
     </div>

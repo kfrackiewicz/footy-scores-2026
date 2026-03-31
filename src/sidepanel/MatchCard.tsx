@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { ApiMatchResult, ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
 import { getGender, getPhase } from '../utils/matchCode';
 import { PHASE_LABELS } from '../constants';
@@ -11,10 +12,32 @@ interface Props {
   scoreLoading: boolean;
   failed: boolean;
   rawResult: ApiMatchResult | undefined;
+  loadMatch: (code: string) => void;
   reloadMatch: (code: string) => Promise<boolean>;
 }
 
-export default function MatchCard({ match, events, score, scoreLoading, failed, rawResult, reloadMatch }: Props) {
+export default function MatchCard({ match, events, score, scoreLoading, failed, rawResult, loadMatch, reloadMatch }: Props) {
+  const cardRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    if (match.status.code !== 'FINISHED') return;
+    const el = cardRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMatch(match.code);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [match.code, match.status.code]);
+
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
@@ -33,7 +56,7 @@ export default function MatchCard({ match, events, score, scoreLoading, failed, 
     : 'vs';
 
   return (
-    <li className="match-card">
+    <li className="match-card" ref={cardRef}>
       <div className="match-meta">
         <span className="match-category">{gender}{phaseLabel ? ` · ${phaseLabel}` : ''}</span>
         <MatchMenu match={match} rawResult={rawResult} events={events} reloadMatch={reloadMatch} />
