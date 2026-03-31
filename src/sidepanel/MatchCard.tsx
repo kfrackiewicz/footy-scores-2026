@@ -9,11 +9,12 @@ interface Props {
   events: EventsDict;
   score: MatchScore | undefined;
   scoreLoading: boolean;
+  failed: boolean;
   rawResult: ApiMatchResult | undefined;
-  reloadMatch: (code: string) => Promise<void>;
+  reloadMatch: (code: string) => Promise<boolean>;
 }
 
-export default function MatchCard({ match, events, score, scoreLoading, rawResult, reloadMatch }: Props) {
+export default function MatchCard({ match, events, score, scoreLoading, failed, rawResult, reloadMatch }: Props) {
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
@@ -25,6 +26,8 @@ export default function MatchCard({ match, events, score, scoreLoading, rawResul
     ? `${score.home} – ${score.away}`
     : scoreLoading
     ? null
+    : failed
+    ? '⚠'
     : isFinished
     ? '– –'
     : 'vs';
@@ -40,7 +43,7 @@ export default function MatchCard({ match, events, score, scoreLoading, rawResul
         <span className="team">{home?.participant.name ?? '—'}</span>
         {scoreLoading
           ? <span className="match-score-spinner" aria-label="Loading score" />
-          : <span className={`match-score${score ? ' match-score--result' : ''}`}>{scoreDisplay}</span>
+          : <span className={`match-score${score ? ' match-score--result' : ''}${failed ? ' match-score--error' : ''}`}>{scoreDisplay}</span>
         }
         <span className="team team--away">{away?.participant.name ?? '—'}</span>
       </div>

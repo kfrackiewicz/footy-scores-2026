@@ -267,6 +267,10 @@ body {
   animation: fadeInOut 2.5s ease forwards;
 }
 
+.match-menu-toast--error {
+  background: #c0392b;
+}
+
 @keyframes fadeInOut {
   0%   { opacity: 0; transform: translateY(-4px); }
   10%  { opacity: 1; transform: translateY(0); }
@@ -342,6 +346,10 @@ body {
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
+}
+
+.match-score--error {
+  color: #e05252;
 }
 
 .match-score-spinner {

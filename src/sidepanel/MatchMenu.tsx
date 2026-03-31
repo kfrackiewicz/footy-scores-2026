@@ -8,12 +8,12 @@ interface Props {
   match: ApiScheduleItem;
   rawResult: ApiMatchResult | undefined;
   events: EventsDict;
-  reloadMatch: (code: string) => Promise<void>;
+  reloadMatch: (code: string) => Promise<boolean>;
 }
 
 export default function MatchMenu({ match, rawResult, events, reloadMatch }: Props) {
   const [open, setOpen] = useState(false);
-  const [reloaded, setReloaded] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -58,16 +58,16 @@ export default function MatchMenu({ match, rawResult, events, reloadMatch }: Pro
         ⋮
       </button>
 
-      {reloaded && <span className="match-menu-toast">Reloaded!</span>}
+      {toast && <span className={`match-menu-toast${toast === 'Failed to load' ? ' match-menu-toast--error' : ''}`}>{toast}</span>}
       {copied && <span className="match-menu-toast">Copied!</span>}
 
       {open && (
         <div className="match-menu-dropdown">
           <button className="match-menu-item" onClick={async () => {
             setOpen(false);
-            await reloadMatch(match.code);
-            setReloaded(true);
-            setTimeout(() => setReloaded(false), 2000);
+            const ok = await reloadMatch(match.code);
+            setToast(ok ? 'Reloaded!' : 'Failed to load');
+            setTimeout(() => setToast(null), 2000);
           }}>
             Reload data
           </button>
