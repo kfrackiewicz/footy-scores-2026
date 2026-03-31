@@ -72,3 +72,38 @@ export interface ApiScheduleItem {
 export interface ScheduleResponse {
   schedules: ApiScheduleItem[];
 }
+
+// ---------------------------------------------------------------------------
+// RES_ByRSC_H2H — match result
+// ---------------------------------------------------------------------------
+export interface ApiResultItem {
+  sortOrder: number;    // 1 = home, 2 = away
+  teamCode: string;
+  resultData: string;  // final score as string, e.g. "2"
+  resultWLT: 'W' | 'L' | 'D';
+  participant: { name: string };
+}
+
+export interface ApiResultPeriod {
+  p_code: string;       // "H1" | "H2" | "TOT"
+  home: { score: string };
+  away: { score: string };
+}
+
+export interface ApiMatchResult {
+  items: ApiResultItem[];
+  periods: ApiResultPeriod[];
+  status: { code: string };
+}
+
+export interface ResultResponse {
+  results: ApiMatchResult;
+}
+
+export interface MatchScore {
+  home: string;
+  away: string;
+}
+
+// Keyed by match code
+export type ResultsDict = Record<string, MatchScore>;

@@ -1,10 +1,11 @@
-import type { ApiScheduleItem, EventsDict } from '../types/api';
+import type { ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
 import { getGender, getPhase } from '../utils/matchCode';
 import { PHASE_LABELS } from '../types/filters';
 
 interface Props {
   match: ApiScheduleItem;
   events: EventsDict;
+  score: MatchScore | undefined;
 }
 
 function formatDate(iso: string) {
@@ -25,13 +26,19 @@ function getPhaseLabelFromEvents(code: string, events: EventsDict): string {
   return phase?.shortDescription ?? '';
 }
 
-export default function MatchCard({ match, events }: Props) {
+export default function MatchCard({ match, events, score }: Props) {
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
   const phase = getPhase(match.code);
   const phaseLabel = phase ? (PHASE_LABELS[phase] ?? getPhaseLabelFromEvents(match.code, events)) : '';
   const isFinished = match.status.code === 'FINISHED';
+
+  const scoreDisplay = score
+    ? `${score.home} – ${score.away}`
+    : isFinished
+    ? '– –'
+    : 'vs';
 
   return (
     <li className="match-card">
@@ -44,7 +51,9 @@ export default function MatchCard({ match, events }: Props) {
 
       <div className="match-teams">
         <span className="team">{home?.participant.name ?? '—'}</span>
-        <span className="match-score">vs</span>
+        <span className={`match-score${score ? ' match-score--result' : ''}`}>
+          {scoreDisplay}
+        </span>
         <span className="team team--away">{away?.participant.name ?? '—'}</span>
       </div>
 

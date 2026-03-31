@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useOlympicsData } from '../hooks/useOlympicsData';
+import { useMatchResults } from '../hooks/useMatchResults';
 import { DEFAULT_FILTERS } from '../types/filters';
 import type { Filters } from '../types/filters';
 import { getGender, getPhase } from '../utils/matchCode';
@@ -9,6 +10,7 @@ import MatchList from './MatchList';
 
 export default function App() {
   const { matches, events, loading, error } = useOlympicsData();
+  const results = useMatchResults(matches);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
   const filtered = matches.filter((m) => {
@@ -36,7 +38,7 @@ export default function App() {
         {loading && <p className="state-msg">Loading matches...</p>}
         {error   && <p className="state-msg state-msg--error">{error}</p>}
         {!loading && !error && (
-          <MatchList matches={filtered} events={events} />
+          <MatchList matches={filtered} events={events} results={results} />
         )}
       </main>
     </div>

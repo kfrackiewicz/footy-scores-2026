@@ -244,10 +244,16 @@ body {
 }
 
 .match-score {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.match-score--result {
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
-  white-space: nowrap;
 }
 
 .match-footer {
