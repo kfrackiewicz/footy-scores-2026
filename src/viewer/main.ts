@@ -90,6 +90,7 @@ function renderViewer(raw: string) {
       </div>
       <div class="header-actions">
         <button class="btn" id="btn-export">Export JSON</button>
+        <button class="btn" id="btn-copy-json">Copy JSON</button>
         <button class="btn btn--green" id="btn-copy-raw-url">Copy raw JSON URL</button>
       </div>
     </div>
@@ -107,6 +108,11 @@ function renderViewer(raw: string) {
     a.download = `${home}_vs_${away}.json`.replace(/\s+/g, '_');
     a.click();
     URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btn-copy-json')!.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    showToast('JSON copied!');
   });
 
   document.getElementById('btn-copy-raw-url')!.addEventListener('click', async () => {
