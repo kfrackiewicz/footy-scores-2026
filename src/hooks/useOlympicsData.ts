@@ -40,7 +40,7 @@ export function useOlympicsData() {
           eventsData.events.map((e) => [e.code, e]),
         );
 
-        const sorted = [...schedule.schedules].sort(
+        const sorted = schedule.schedules.filter((m) => m.start?.length >= 2).sort(
           (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
         );
 
