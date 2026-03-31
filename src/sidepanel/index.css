@@ -195,6 +195,39 @@ body {
   color: #DF0024;
 }
 
+.state-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.retry-btn {
+  background: #0085C7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retry-btn:hover {
+  background: #006fa8;
+}
+
+.main-spinner {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid #3a3a5e;
+  border-top-color: #0085C7;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 40px auto 0;
+}
+
 /* ── Match list ── */
 .match-list {
   list-style: none;

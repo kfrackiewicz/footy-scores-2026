@@ -9,7 +9,7 @@ import FiltersBar from './Filters';
 import MatchList from './MatchList';
 
 export default function App() {
-  const { matches, events, loading, error } = useOlympicsData();
+  const { matches, events, loading, error, retry } = useOlympicsData();
   const { results, rawResults, loading: resultsLoading, reloadingCodes, failedCodes, reloadMatch } = useMatchResults(matches);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
@@ -35,8 +35,13 @@ export default function App() {
       <FiltersBar filters={filters} onChange={setFilters} />
 
       <main className="main">
-        {loading && <p className="state-msg">Loading matches...</p>}
-        {error   && <p className="state-msg state-msg--error">{error}</p>}
+        {loading && <span className="main-spinner" aria-label="Loading matches" />}
+        {error && (
+          <div className="state-error">
+            <p className="state-msg state-msg--error">{error}</p>
+            <button className="retry-btn" onClick={retry}>Retry</button>
+          </div>
+        )}
         {!loading && !error && (
           <MatchList matches={filtered} events={events} results={results} rawResults={rawResults} resultsLoading={resultsLoading} reloadingCodes={reloadingCodes} failedCodes={failedCodes} reloadMatch={reloadMatch} />
         )}

@@ -10,12 +10,18 @@ interface State {
 }
 
 export function useOlympicsData() {
+  const [retryCount, setRetryCount] = useState(0);
   const [state, setState] = useState<State>({
     matches: [],
     events: {},
     loading: true,
     error: null,
   });
+
+  function retry() {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setRetryCount((n) => n + 1);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +62,7 @@ export function useOlympicsData() {
 
     fetchAll();
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
 
-  return state;
+  return { ...state, retry };
 }
