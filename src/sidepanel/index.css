@@ -7,21 +7,25 @@
 :root {
   --bg: #0f0f1a;
   --surface: #1a1a2e;
-  --accent-blue: #0085C7;
-  --accent-yellow: #F4C300;
-  --accent-green: #009F3D;
-  --accent-red: #DF0024;
   --text: #f0f0f0;
   --text-muted: #888;
-  --border: #2a2a3e;
 }
 
-html, body {
+html, body, #root {
   height: 100%;
+}
+
+body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   font-size: 14px;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* ── Header ── */
@@ -34,10 +38,10 @@ html, body {
   border-bottom: 2px solid transparent;
   border-image: linear-gradient(
     90deg,
-    var(--accent-blue),
-    var(--accent-yellow),
-    var(--accent-green),
-    var(--accent-red),
+    #0085C7,
+    #F4C300,
+    #009F3D,
+    #DF0024,
     #000
   ) 1;
 }
@@ -64,6 +68,7 @@ html, body {
 
 /* ── Main ── */
 .main {
+  flex: 1;
   padding: 20px 16px;
 }
 
