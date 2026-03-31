@@ -55,7 +55,11 @@ export function useOlympicsData() {
         }
       } catch (err) {
         if (!cancelled) {
-          setState((prev) => ({ ...prev, loading: false, error: String(err) }));
+          const isOffline = !navigator.onLine || err instanceof TypeError;
+          const message = isOffline
+            ? "Looks like you're offline... check your connection and try again."
+            : `Hmm, something went wrong on our end. (${String(err)})`;
+          setState((prev) => ({ ...prev, loading: false, error: message }));
         }
       }
     }
@@ -63,6 +67,18 @@ export function useOlympicsData() {
     fetchAll();
     return () => { cancelled = true; };
   }, [retryCount]);
+
+  useEffect(() => {
+    function handleOnline() {
+      setState((prev) => {
+        if (prev.error === null) return prev;
+        return { ...prev, loading: true, error: null };
+      });
+      setRetryCount((n) => n + 1);
+    }
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   return { ...state, retry };
 }
