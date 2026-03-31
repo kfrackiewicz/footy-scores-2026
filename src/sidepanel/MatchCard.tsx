@@ -10,9 +10,10 @@ interface Props {
   score: MatchScore | undefined;
   scoreLoading: boolean;
   rawResult: ApiMatchResult | undefined;
+  reloadMatch: (code: string) => void;
 }
 
-export default function MatchCard({ match, events, score, scoreLoading, rawResult }: Props) {
+export default function MatchCard({ match, events, score, scoreLoading, rawResult, reloadMatch }: Props) {
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
@@ -32,7 +33,7 @@ export default function MatchCard({ match, events, score, scoreLoading, rawResul
     <li className="match-card">
       <div className="match-meta">
         <span className="match-category">{gender}{phaseLabel ? ` · ${phaseLabel}` : ''}</span>
-        <MatchMenu match={match} rawResult={rawResult} events={events} />
+        <MatchMenu match={match} rawResult={rawResult} events={events} reloadMatch={reloadMatch} />
       </div>
 
       <div className="match-teams">

@@ -10,7 +10,11 @@ interface State {
   loading: boolean;
 }
 
-export function useMatchResults(matches: ApiScheduleItem[]): State {
+interface Return extends State {
+  reloadMatch: (code: string) => void;
+}
+
+export function useMatchResults(matches: ApiScheduleItem[]): Return {
   const [state, setState] = useState<State>({ results: {}, rawResults: {}, loading: false });
 
   useEffect(() => {
@@ -55,5 +59,23 @@ export function useMatchResults(matches: ApiScheduleItem[]): State {
     return () => { cancelled = true; };
   }, [matches]);
 
-  return state;
+  function reloadMatch(code: string) {
+    fetch(API.resultUrl(code))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: ResultResponse | null) => {
+        if (!data) return;
+        const home = data.results.items.find((i) => i.sortOrder === 1);
+        const away = data.results.items.find((i) => i.sortOrder === 2);
+        if (home && away) {
+          setState((prev) => ({
+            ...prev,
+            results: { ...prev.results, [code]: { home: home.resultData, away: away.resultData } },
+            rawResults: { ...prev.rawResults, [code]: data.results },
+          }));
+        }
+      })
+      .catch(() => {});
+  }
+
+  return { ...state, reloadMatch };
 }

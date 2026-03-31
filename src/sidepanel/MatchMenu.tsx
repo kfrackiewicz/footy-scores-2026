@@ -8,9 +8,10 @@ interface Props {
   match: ApiScheduleItem;
   rawResult: ApiMatchResult | undefined;
   events: EventsDict;
+  reloadMatch: (code: string) => void;
 }
 
-export default function MatchMenu({ match, rawResult, events }: Props) {
+export default function MatchMenu({ match, rawResult, events, reloadMatch }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -60,6 +61,9 @@ export default function MatchMenu({ match, rawResult, events }: Props) {
 
       {open && (
         <div className="match-menu-dropdown">
+          <button className="match-menu-item" onClick={() => { reloadMatch(match.code); setOpen(false); }}>
+            Load data
+          </button>
           <button className="match-menu-item" onClick={handleExport} disabled={!rawResult}>
             {rawResult ? 'Export JSON' : 'Loading…'}
           </button>

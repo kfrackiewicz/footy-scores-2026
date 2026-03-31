@@ -8,9 +8,10 @@ interface Props {
   results: ResultsDict;
   rawResults: RawResultsDict;
   resultsLoading: boolean;
+  reloadMatch: (code: string) => void;
 }
 
-export default function MatchList({ matches, events, results, rawResults, resultsLoading }: Props) {
+export default function MatchList({ matches, events, results, rawResults, resultsLoading, reloadMatch }: Props) {
   if (matches.length === 0) {
     return <p className="state-msg">No matches found.</p>;
   }
@@ -25,6 +26,7 @@ export default function MatchList({ matches, events, results, rawResults, result
           score={results[match.code]}
           scoreLoading={resultsLoading && !results[match.code] && match.status.code === 'FINISHED'}
           rawResult={rawResults[match.code]}
+          reloadMatch={reloadMatch}
         />
       ))}
     </ul>
