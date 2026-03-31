@@ -49,12 +49,7 @@ export default function MatchCard({ match, events, score, scoreLoading, rawResul
     <li className="match-card">
       <div className="match-meta">
         <span className="match-category">{gender}{phaseLabel ? ` · ${phaseLabel}` : ''}</span>
-        <div className="match-meta-right">
-          <span className={`match-status match-status--${match.status.code.toLowerCase()}`}>
-            {isFinished ? 'FT' : match.status.description}
-          </span>
-          <MatchMenu match={match} rawResult={rawResult} events={events} />
-        </div>
+        <MatchMenu match={match} rawResult={rawResult} events={events} />
       </div>
 
       <div className="match-teams">

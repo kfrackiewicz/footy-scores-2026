@@ -235,19 +235,20 @@ body {
 }
 
 .match-menu-trigger {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1rem;
+  background: #2a2a4e;
+  border: 1px solid #3a3a6e;
+  color: #aaa;
+  font-size: 0.9rem;
   cursor: pointer;
-  padding: 0 2px;
-  line-height: 1;
+  padding: 1px 7px;
+  line-height: 1.4;
   border-radius: 4px;
-  transition: color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .match-menu-trigger:hover {
-  color: var(--text);
+  background: #3a3a6e;
+  color: #fff;
 }
 
 .match-menu-dropdown {
