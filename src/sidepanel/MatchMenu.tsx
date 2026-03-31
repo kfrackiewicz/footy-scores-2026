@@ -71,22 +71,26 @@ export default function MatchMenu({ match, rawResult, events, reloadMatch }: Pro
           }}>
             Reload data
           </button>
-          <button className="match-menu-item" onClick={handleExport} disabled={!rawResult}>
-            {rawResult ? 'Export JSON' : 'Loading…'}
-          </button>
-          <button className="match-menu-item" disabled={!rawResult} onClick={async () => {
-            const data = buildData();
-            if (!data) return;
-            await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-            setOpen(false);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-          }}>
-            {rawResult ? 'Copy JSON' : 'Loading…'}
-          </button>
-          <button className="match-menu-item" onClick={handleOpenInTab} disabled={!rawResult}>
-            {rawResult ? 'Open in new tab' : 'Loading…'}
-          </button>
+          {rawResult && (
+            <>
+              <button className="match-menu-item" onClick={handleExport}>
+                Export JSON
+              </button>
+              <button className="match-menu-item" onClick={async () => {
+                const data = buildData();
+                if (!data) return;
+                await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+                setOpen(false);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}>
+                Copy JSON
+              </button>
+              <button className="match-menu-item" onClick={handleOpenInTab}>
+                Open in new tab
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
