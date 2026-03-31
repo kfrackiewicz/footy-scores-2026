@@ -13,7 +13,6 @@ interface Props {
 
 export default function MatchMenu({ match, rawResult, events, reloadMatch }: Props) {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [reloaded, setReloaded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -58,7 +57,6 @@ export default function MatchMenu({ match, rawResult, events, reloadMatch }: Pro
         ⋮
       </button>
 
-      {copied && <span className="match-menu-toast">URL copied!</span>}
       {reloaded && <span className="match-menu-toast">Reloaded!</span>}
 
       {open && (

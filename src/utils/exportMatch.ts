@@ -47,7 +47,7 @@ function buildLineup(item: ApiMatchResult['items'][number]) {
       ),
   );
 
-  const mapAthlete = (a: (typeof item.teamAthletes)[number]) => {
+  const mapAthlete = (a: NonNullable<typeof item.teamAthletes>[number]) => {
     const position =
       a.eventUnitEntries?.find((e) => e.eue_code === 'POSITION' && e.eue_pos === '1')
         ?.eue_value ?? null;

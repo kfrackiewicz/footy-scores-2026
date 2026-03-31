@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PHASE_LABELS, DEFAULT_FILTERS } from '../constants';
+import { PHASE_LABELS } from '../constants';
 import type { Filters, Gender, Phase } from '../types/filters';
 import { toggleItem } from '../utils/helpers';
 
