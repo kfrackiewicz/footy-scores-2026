@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Footy Scores",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "description": "Live football scores in your browser side panel",
   "permissions": ["sidePanel", "storage", "tabs"],
   "action": {

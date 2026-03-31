@@ -1,6 +1,7 @@
 import type { ApiMatchResult, ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
 import { getGender, getPhase } from '../utils/matchCode';
 import { PHASE_LABELS } from '../types/filters';
+import { formatDate, getPhaseLabelFromEvents } from '../utils/helpers';
 import MatchMenu from './MatchMenu';
 
 interface Props {
@@ -9,24 +10,6 @@ interface Props {
   score: MatchScore | undefined;
   scoreLoading: boolean;
   rawResult: ApiMatchResult | undefined;
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function getPhaseLabelFromEvents(code: string, events: EventsDict): string {
-  const eventCode = code.slice(0, 22);
-  const event = events[eventCode];
-  if (!event) return '';
-  const phaseCode = code.slice(22, 26).trim().replace(/-/g, '');
-  const phase = event.phases.find((p) => p.code.slice(22, 26).trim().replace(/-/g, '') === phaseCode);
-  return phase?.shortDescription ?? '';
 }
 
 export default function MatchCard({ match, events, score, scoreLoading, rawResult }: Props) {

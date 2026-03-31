@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { PHASE_LABELS, DEFAULT_FILTERS } from '../types/filters';
 import type { Filters, Gender, Phase } from '../types/filters';
+import { toggleItem } from '../utils/helpers';
 
 interface Props {
   filters: Filters;
   onChange: (f: Filters) => void;
-}
-
-function toggleItem<T>(arr: T[], item: T): T[] {
-  return arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
 }
 
 export default function FiltersBar({ filters, onChange }: Props) {
