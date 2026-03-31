@@ -1,9 +1,24 @@
+import { useState } from 'react';
 import { useOlympicsData } from '../hooks/useOlympicsData';
+import { DEFAULT_FILTERS } from '../types/filters';
+import type { Filters } from '../types/filters';
+import { getGender, getPhase } from '../utils/matchCode';
 import FootballIcon from './FootballIcon';
+import FiltersBar from './Filters';
 import MatchList from './MatchList';
 
 export default function App() {
   const { matches, events, loading, error } = useOlympicsData();
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+
+  const filtered = matches.filter((m) => {
+    const gender = getGender(m.code);
+    const phase  = getPhase(m.code);
+    return (
+      filters.genders.includes(gender) &&
+      (phase === null || filters.phases.includes(phase))
+    );
+  });
 
   return (
     <div className="app">
@@ -15,11 +30,13 @@ export default function App() {
         </div>
       </header>
 
+      <FiltersBar filters={filters} onChange={setFilters} />
+
       <main className="main">
         {loading && <p className="state-msg">Loading matches...</p>}
         {error   && <p className="state-msg state-msg--error">{error}</p>}
         {!loading && !error && (
-          <MatchList matches={matches} events={events} />
+          <MatchList matches={filtered} events={events} />
         )}
       </main>
     </div>
