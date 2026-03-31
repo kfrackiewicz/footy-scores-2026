@@ -5,9 +5,10 @@ interface Props {
   matches: ApiScheduleItem[];
   events: EventsDict;
   results: ResultsDict;
+  resultsLoading: boolean;
 }
 
-export default function MatchList({ matches, events, results }: Props) {
+export default function MatchList({ matches, events, results, resultsLoading }: Props) {
   if (matches.length === 0) {
     return <p className="state-msg">No matches found.</p>;
   }
@@ -20,6 +21,7 @@ export default function MatchList({ matches, events, results }: Props) {
           match={match}
           events={events}
           score={results[match.code]}
+          scoreLoading={resultsLoading && !results[match.code] && match.status.code === 'FINISHED'}
         />
       ))}
     </ul>

@@ -6,6 +6,7 @@ interface Props {
   match: ApiScheduleItem;
   events: EventsDict;
   score: MatchScore | undefined;
+  scoreLoading: boolean;
 }
 
 function formatDate(iso: string) {
@@ -26,7 +27,7 @@ function getPhaseLabelFromEvents(code: string, events: EventsDict): string {
   return phase?.shortDescription ?? '';
 }
 
-export default function MatchCard({ match, events, score }: Props) {
+export default function MatchCard({ match, events, score, scoreLoading }: Props) {
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
@@ -36,6 +37,8 @@ export default function MatchCard({ match, events, score }: Props) {
 
   const scoreDisplay = score
     ? `${score.home} – ${score.away}`
+    : scoreLoading
+    ? null
     : isFinished
     ? '– –'
     : 'vs';
@@ -51,9 +54,10 @@ export default function MatchCard({ match, events, score }: Props) {
 
       <div className="match-teams">
         <span className="team">{home?.participant.name ?? '—'}</span>
-        <span className={`match-score${score ? ' match-score--result' : ''}`}>
-          {scoreDisplay}
-        </span>
+        {scoreLoading
+          ? <span className="match-score-spinner" aria-label="Loading score" />
+          : <span className={`match-score${score ? ' match-score--result' : ''}`}>{scoreDisplay}</span>
+        }
         <span className="team team--away">{away?.participant.name ?? '—'}</span>
       </div>
 
