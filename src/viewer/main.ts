@@ -10,16 +10,61 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
   }
 
   const data = JSON.parse(raw);
+  const home = data.teams?.home ?? '?';
+  const away = data.teams?.away ?? '?';
 
-  document.title = `${data.teams?.home ?? '?'} vs ${data.teams?.away ?? '?'} — Footy Scores`;
+  document.title = `${home} vs ${away} — Footy Scores`;
 
   root.innerHTML = `
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { background: #0f0f1a; color: #f0f0f0; font-family: 'Segoe UI', system-ui, sans-serif; }
-      .header { background: #1a1a2e; padding: 20px 32px; border-bottom: 2px solid #0085C7; }
-      .header h1 { font-size: 1.4rem; }
-      .header p { color: #888; font-size: 0.85rem; margin-top: 4px; }
+      .header {
+        background: #1a1a2e;
+        padding: 16px 32px;
+        border-bottom: 2px solid #0085C7;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .header-info h1 { font-size: 1.3rem; }
+      .header-info p { color: #888; font-size: 0.82rem; margin-top: 3px; }
+      .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+      .btn {
+        padding: 7px 14px;
+        border-radius: 6px;
+        border: 1px solid #3a3a6e;
+        background: #2a2a4e;
+        color: #f0f0f0;
+        font-size: 0.82rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s;
+      }
+      .btn:hover { background: #3a3a6e; }
+      .btn--green { border-color: #009F3D; background: #0a2a12; color: #4cff7c; }
+      .btn--green:hover { background: #0d3d1a; }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #009F3D;
+        color: #fff;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 8px;
+        animation: fadeInOut 2.5s ease forwards;
+        z-index: 999;
+      }
+      @keyframes fadeInOut {
+        0%   { opacity: 0; transform: translateY(8px); }
+        10%  { opacity: 1; transform: translateY(0); }
+        80%  { opacity: 1; }
+        100% { opacity: 0; }
+      }
       .content { padding: 24px 32px; }
       pre {
         background: #1a1a2e;
@@ -32,15 +77,50 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
         word-break: break-word;
       }
     </style>
+
     <div class="header">
-      <h1>${data.teams?.home ?? '?'} vs ${data.teams?.away ?? '?'}</h1>
-      <p>${data.competition?.round ?? ''} · ${data.competition?.season ?? ''} · ${data.venue?.name ?? ''}</p>
+      <div class="header-info">
+        <h1>${escapeHtml(home)} vs ${escapeHtml(away)}</h1>
+        <p>${escapeHtml(data.competition?.round ?? '')} · ${escapeHtml(data.competition?.season ?? '')} · ${escapeHtml(data.venue?.name ?? '')}</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="btn-export">Export JSON</button>
+        <button class="btn btn--green" id="btn-copy-url">Copy blob URL</button>
+      </div>
     </div>
+
     <div class="content">
-      <pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+      <pre>${escapeHtml(raw)}</pre>
     </div>
   `;
+
+  const blob = new Blob([raw], { type: 'application/json' });
+
+  document.getElementById('btn-export')!.addEventListener('click', () => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${home}_vs_${away}.json`.replace(/\s+/g, '_');
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btn-copy-url')!.addEventListener('click', async () => {
+    const url = URL.createObjectURL(blob);
+    await navigator.clipboard.writeText(url);
+    showToast('Blob URL copied!');
+  });
 });
+
+function showToast(msg: string) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
 
 function escapeHtml(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
