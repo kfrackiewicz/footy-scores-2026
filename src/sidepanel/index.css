@@ -358,6 +358,7 @@ body {
   gap: 8px;
   font-size: 0.88rem;
   font-weight: 600;
+  min-height: 1.5rem;
 }
 
 .team {
