@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Footy Scores",
+  "version": "0.1.0",
+  "description": "Live football scores in your browser side panel",
+  "permissions": ["sidePanel"],
+  "action": {
+    "default_title": "Footy Scores",
+    "default_icon": {
+      "16": "icons/icon16.svg",
+      "48": "icons/icon48.svg",
+      "128": "icons/icon128.svg"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  }
+}
