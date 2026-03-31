@@ -16,7 +16,7 @@ export default function App() {
       </header>
 
       <main className="main">
-        {loading && <p className="state-msg">Ładowanie meczów...</p>}
+        {loading && <p className="state-msg">Loading matches...</p>}
         {error   && <p className="state-msg state-msg--error">{error}</p>}
         {!loading && !error && (
           <MatchList matches={matches} events={events} />

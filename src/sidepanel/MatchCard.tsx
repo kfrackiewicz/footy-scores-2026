@@ -6,7 +6,7 @@ interface Props {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('pl-PL', {
+  return new Date(iso).toLocaleString('en-GB', {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',

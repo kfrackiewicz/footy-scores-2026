@@ -8,7 +8,7 @@ interface Props {
 
 export default function MatchList({ matches, events }: Props) {
   if (matches.length === 0) {
-    return <p className="state-msg">Brak meczów.</p>;
+    return <p className="state-msg">No matches found.</p>;
   }
 
   return (
