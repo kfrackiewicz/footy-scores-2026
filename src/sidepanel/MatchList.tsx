@@ -1,14 +1,16 @@
 import type { ApiScheduleItem, EventsDict, ResultsDict } from '../types/api';
+import type { RawResultsDict } from '../hooks/useMatchResults';
 import MatchCard from './MatchCard';
 
 interface Props {
   matches: ApiScheduleItem[];
   events: EventsDict;
   results: ResultsDict;
+  rawResults: RawResultsDict;
   resultsLoading: boolean;
 }
 
-export default function MatchList({ matches, events, results, resultsLoading }: Props) {
+export default function MatchList({ matches, events, results, rawResults, resultsLoading }: Props) {
   if (matches.length === 0) {
     return <p className="state-msg">No matches found.</p>;
   }
@@ -22,6 +24,7 @@ export default function MatchList({ matches, events, results, resultsLoading }: 
           events={events}
           score={results[match.code]}
           scoreLoading={resultsLoading && !results[match.code] && match.status.code === 'FINISHED'}
+          rawResult={rawResults[match.code]}
         />
       ))}
     </ul>

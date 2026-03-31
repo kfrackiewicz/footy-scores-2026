@@ -77,11 +77,40 @@ export interface ScheduleResponse {
 // RES_ByRSC_H2H — match result
 // ---------------------------------------------------------------------------
 export interface ApiResultItem {
-  sortOrder: number;    // 1 = home, 2 = away
+  sortOrder: number;
   teamCode: string;
-  resultData: string;  // final score as string, e.g. "2"
+  resultData: string;
   resultWLT: 'W' | 'L' | 'D';
   participant: { name: string };
+  teamCoaches?: Array<{
+    order: number;
+    function: { functionCode: string; description: string };
+    coach: {
+      code: string;
+      givenName: string;
+      familyName: string;
+      name: string;
+      nationality?: { code: string };
+    };
+  }>;
+  teamAthletes?: Array<{
+    order: number;
+    bib: string;
+    participantCode: string;
+    athlete: {
+      code: string;
+      name: string;
+      TVName: string;
+      familyName: string;
+      givenName: string;
+    };
+    eventUnitEntries?: Array<{
+      eue_code: string;
+      eue_value: string;
+      eue_pos?: string;
+      eue_type?: string;
+    }>;
+  }>;
 }
 
 export interface ApiResultPeriod {
@@ -90,10 +119,35 @@ export interface ApiResultPeriod {
   away: { score: string };
 }
 
+export interface ApiPlayByPlayAction {
+  pbpa_period: string;
+  pbpa_id: string;
+  pbpa_Action: string;
+  pbpa_Result?: string;
+  pbpa_When?: string;
+  pbpa_ScoreH?: string;
+  pbpa_ScoreA?: string;
+  competitors?: Array<{
+    pbpc_code: string;
+    pbpc_order: number;
+    pbpc_type: string;
+    athletes?: Array<{
+      pbpat_code: string;
+      pbpat_order: string;
+      pbpat_bib?: string;
+      pbpat_role?: string;
+    }>;
+  }>;
+}
+
 export interface ApiMatchResult {
   items: ApiResultItem[];
   periods: ApiResultPeriod[];
   status: { code: string };
+  playByPlay?: Array<{
+    subcode: string;
+    actions?: ApiPlayByPlayAction[];
+  }>;
 }
 
 export interface ResultResponse {

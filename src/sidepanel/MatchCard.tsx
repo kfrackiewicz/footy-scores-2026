@@ -1,12 +1,14 @@
-import type { ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
+import type { ApiMatchResult, ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
 import { getGender, getPhase } from '../utils/matchCode';
 import { PHASE_LABELS } from '../types/filters';
+import MatchMenu from './MatchMenu';
 
 interface Props {
   match: ApiScheduleItem;
   events: EventsDict;
   score: MatchScore | undefined;
   scoreLoading: boolean;
+  rawResult: ApiMatchResult | undefined;
 }
 
 function formatDate(iso: string) {
@@ -27,7 +29,7 @@ function getPhaseLabelFromEvents(code: string, events: EventsDict): string {
   return phase?.shortDescription ?? '';
 }
 
-export default function MatchCard({ match, events, score, scoreLoading }: Props) {
+export default function MatchCard({ match, events, score, scoreLoading, rawResult }: Props) {
   const home = match.start.find((s) => s.sortOrder === 1);
   const away = match.start.find((s) => s.sortOrder === 2);
   const gender = getGender(match.code) === 'M' ? "Men's" : "Women's";
@@ -47,9 +49,12 @@ export default function MatchCard({ match, events, score, scoreLoading }: Props)
     <li className="match-card">
       <div className="match-meta">
         <span className="match-category">{gender}{phaseLabel ? ` · ${phaseLabel}` : ''}</span>
-        <span className={`match-status match-status--${match.status.code.toLowerCase()}`}>
-          {isFinished ? 'FT' : match.status.description}
-        </span>
+        <div className="match-meta-right">
+          <span className={`match-status match-status--${match.status.code.toLowerCase()}`}>
+            {isFinished ? 'FT' : match.status.description}
+          </span>
+          <MatchMenu match={match} rawResult={rawResult} events={events} />
+        </div>
       </div>
 
       <div className="match-teams">
