@@ -10,7 +10,7 @@ interface Props {
   score: MatchScore | undefined;
   scoreLoading: boolean;
   rawResult: ApiMatchResult | undefined;
-  reloadMatch: (code: string) => void;
+  reloadMatch: (code: string) => Promise<void>;
 }
 
 export default function MatchCard({ match, events, score, scoreLoading, rawResult, reloadMatch }: Props) {

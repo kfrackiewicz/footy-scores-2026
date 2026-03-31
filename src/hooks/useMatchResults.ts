@@ -8,14 +8,15 @@ interface State {
   results: ResultsDict;
   rawResults: RawResultsDict;
   loading: boolean;
+  reloadingCodes: Set<string>;
 }
 
 interface Return extends State {
-  reloadMatch: (code: string) => void;
+  reloadMatch: (code: string) => Promise<void>;
 }
 
 export function useMatchResults(matches: ApiScheduleItem[]): Return {
-  const [state, setState] = useState<State>({ results: {}, rawResults: {}, loading: false });
+  const [state, setState] = useState<State>({ results: {}, rawResults: {}, loading: false, reloadingCodes: new Set() });
 
   useEffect(() => {
     const finished = matches.filter((m) => m.status.code === 'FINISHED');
@@ -24,7 +25,7 @@ export function useMatchResults(matches: ApiScheduleItem[]): Return {
     let cancelled = false;
     let pending = finished.length;
 
-    setState({ results: {}, rawResults: {}, loading: true });
+    setState((prev) => ({ ...prev, results: {}, rawResults: {}, loading: true }));
 
     for (const m of finished) {
       fetch(API.resultUrl(m.code))
@@ -39,6 +40,7 @@ export function useMatchResults(matches: ApiScheduleItem[]): Return {
             if (home && away) {
               const score: MatchScore = { home: home.resultData, away: away.resultData };
               setState((prev) => ({
+                ...prev,
                 results: { ...prev.results, [m.code]: score },
                 rawResults: { ...prev.rawResults, [m.code]: data.results },
                 loading: pending > 0,
@@ -59,22 +61,30 @@ export function useMatchResults(matches: ApiScheduleItem[]): Return {
     return () => { cancelled = true; };
   }, [matches]);
 
-  function reloadMatch(code: string) {
-    fetch(API.resultUrl(code))
+  function reloadMatch(code: string): Promise<void> {
+    setState((prev) => ({ ...prev, reloadingCodes: new Set([...prev.reloadingCodes, code]) }));
+
+    return fetch(API.resultUrl(code))
       .then((res) => (res.ok ? res.json() : null))
       .then((data: ResultResponse | null) => {
-        if (!data) return;
-        const home = data.results.items.find((i) => i.sortOrder === 1);
-        const away = data.results.items.find((i) => i.sortOrder === 2);
-        if (home && away) {
-          setState((prev) => ({
-            ...prev,
-            results: { ...prev.results, [code]: { home: home.resultData, away: away.resultData } },
-            rawResults: { ...prev.rawResults, [code]: data.results },
-          }));
+        if (data) {
+          const home = data.results.items.find((i) => i.sortOrder === 1);
+          const away = data.results.items.find((i) => i.sortOrder === 2);
+          if (home && away) {
+            setState((prev) => ({
+              ...prev,
+              results: { ...prev.results, [code]: { home: home.resultData, away: away.resultData } },
+              rawResults: { ...prev.rawResults, [code]: data.results },
+              reloadingCodes: new Set([...prev.reloadingCodes].filter((c) => c !== code)),
+            }));
+            return;
+          }
         }
+        setState((prev) => ({ ...prev, reloadingCodes: new Set([...prev.reloadingCodes].filter((c) => c !== code)) }));
       })
-      .catch(() => {});
+      .catch(() => {
+        setState((prev) => ({ ...prev, reloadingCodes: new Set([...prev.reloadingCodes].filter((c) => c !== code)) }));
+      });
   }
 
   return { ...state, reloadMatch };
