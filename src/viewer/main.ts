@@ -102,7 +102,7 @@ function renderViewer(raw: string) {
     </div>
 
     <div class="content">
-      <pre>${escapeHtml(raw)}</pre>
+      <pre>${escapeHtml(JSON.stringify(JSON.parse(raw), null, 2))}</pre>
     </div>
   `;
 
