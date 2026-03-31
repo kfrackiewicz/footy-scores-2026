@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { ApiMatchResult, ApiScheduleItem, EventsDict } from '../types/api';
 import { buildExportJson, downloadJson } from '../utils/exportMatch';
 
+const STORAGE_KEY = 'match_export';
+
 interface Props {
   match: ApiScheduleItem;
   rawResult: ApiMatchResult | undefined;
@@ -12,7 +14,6 @@ export default function MatchMenu({ match, rawResult, events }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -22,13 +23,6 @@ export default function MatchMenu({ match, rawResult, events }: Props) {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
-
-  // Revoke blob URL on unmount
-  useEffect(() => {
-    return () => {
-      if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-    };
-  }, []);
 
   function buildData() {
     if (!rawResult) return null;
@@ -44,21 +38,12 @@ export default function MatchMenu({ match, rawResult, events }: Props) {
     setOpen(false);
   }
 
-  async function handleCopyUrl() {
+  async function handleOpenInTab() {
     const data = buildData();
     if (!data) return;
-
-    // Revoke previous blob if any
-    if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    blobUrlRef.current = url;
-
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
+    await chrome.storage.session.set({ [STORAGE_KEY]: JSON.stringify(data) });
+    chrome.tabs.create({ url: chrome.runtime.getURL('viewer.html') });
     setOpen(false);
-    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -78,8 +63,8 @@ export default function MatchMenu({ match, rawResult, events }: Props) {
           <button className="match-menu-item" onClick={handleExport} disabled={!rawResult}>
             {rawResult ? 'Export JSON' : 'Loading…'}
           </button>
-          <button className="match-menu-item" onClick={handleCopyUrl} disabled={!rawResult}>
-            {rawResult ? 'Copy URL' : 'Loading…'}
+          <button className="match-menu-item" onClick={handleOpenInTab} disabled={!rawResult}>
+            {rawResult ? 'Open in new tab' : 'Loading…'}
           </button>
         </div>
       )}
