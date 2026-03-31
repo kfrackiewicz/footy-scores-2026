@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'match_export';
+const isRaw = new URLSearchParams(location.search).get('raw') === 'true';
 
 chrome.storage.session.get(STORAGE_KEY, (result) => {
   const root = document.getElementById('root')!;
@@ -9,13 +10,35 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
     return;
   }
 
+  if (isRaw) {
+    renderRaw(raw);
+  } else {
+    renderViewer(raw);
+  }
+});
+
+function renderRaw(raw: string) {
+  document.getElementById('root')!.remove();
+  document.head.innerHTML = `
+    <meta charset="UTF-8">
+    <style>
+      body { margin: 0; background: #1e1e1e; color: #d4d4d4; font-family: monospace; font-size: 13px; }
+      pre { padding: 20px; white-space: pre-wrap; word-break: break-word; }
+    </style>`;
+  const pre = document.createElement('pre');
+  pre.textContent = raw;
+  document.body.appendChild(pre);
+}
+
+function renderViewer(raw: string) {
   const data = JSON.parse(raw);
   const home = data.teams?.home ?? '?';
   const away = data.teams?.away ?? '?';
+  const rawUrl = location.href.split('?')[0] + '?raw=true';
 
   document.title = `${home} vs ${away} — Footy Scores`;
 
-  root.innerHTML = `
+  document.getElementById('root')!.innerHTML = `
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body { background: #0f0f1a; color: #f0f0f0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -47,17 +70,11 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
       .btn--green { border-color: #009F3D; background: #0a2a12; color: #4cff7c; }
       .btn--green:hover { background: #0d3d1a; }
       .toast {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background: #009F3D;
-        color: #fff;
-        font-size: 0.82rem;
-        font-weight: 600;
-        padding: 8px 16px;
-        border-radius: 8px;
-        animation: fadeInOut 2.5s ease forwards;
-        z-index: 999;
+        position: fixed; bottom: 24px; right: 24px;
+        background: #009F3D; color: #fff;
+        font-size: 0.82rem; font-weight: 600;
+        padding: 8px 16px; border-radius: 8px;
+        animation: fadeInOut 2.5s ease forwards; z-index: 999;
       }
       @keyframes fadeInOut {
         0%   { opacity: 0; transform: translateY(8px); }
@@ -67,14 +84,9 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
       }
       .content { padding: 24px 32px; }
       pre {
-        background: #1a1a2e;
-        border-radius: 8px;
-        padding: 20px;
-        font-size: 0.82rem;
-        line-height: 1.6;
-        overflow: auto;
-        white-space: pre-wrap;
-        word-break: break-word;
+        background: #1a1a2e; border-radius: 8px; padding: 20px;
+        font-size: 0.82rem; line-height: 1.6;
+        overflow: auto; white-space: pre-wrap; word-break: break-word;
       }
     </style>
 
@@ -85,7 +97,7 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
       </div>
       <div class="header-actions">
         <button class="btn" id="btn-export">Export JSON</button>
-        <button class="btn btn--green" id="btn-copy-url">Copy blob URL</button>
+        <button class="btn btn--green" id="btn-copy-raw-url">Copy raw JSON URL</button>
       </div>
     </div>
 
@@ -94,9 +106,8 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
     </div>
   `;
 
-  const blob = new Blob([raw], { type: 'application/json' });
-
   document.getElementById('btn-export')!.addEventListener('click', () => {
+    const blob = new Blob([raw], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -105,12 +116,11 @@ chrome.storage.session.get(STORAGE_KEY, (result) => {
     URL.revokeObjectURL(url);
   });
 
-  document.getElementById('btn-copy-url')!.addEventListener('click', async () => {
-    const url = URL.createObjectURL(blob);
-    await navigator.clipboard.writeText(url);
-    showToast('Blob URL copied!');
+  document.getElementById('btn-copy-raw-url')!.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(rawUrl);
+    showToast('Raw JSON URL copied!');
   });
-});
+}
 
 function showToast(msg: string) {
   const existing = document.querySelector('.toast');
