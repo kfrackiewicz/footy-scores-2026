@@ -27,8 +27,6 @@ function renderViewer(raw: string) {
   const data = JSON.parse(raw);
   const home = data.teams?.home ?? '?';
   const away = data.teams?.away ?? '?';
-  const rawUrl = location.href.split('?')[0] + '?raw=true';
-
   document.title = `${home} vs ${away} — Footy Scores`;
 
   document.getElementById('root')!.innerHTML = `
@@ -91,7 +89,6 @@ function renderViewer(raw: string) {
       <div class="header-actions">
         <button class="btn" id="btn-export">Export JSON</button>
         <button class="btn" id="btn-copy-json">Copy JSON</button>
-        <button class="btn btn--green" id="btn-copy-raw-url">Copy raw JSON URL</button>
       </div>
     </div>
 
@@ -115,10 +112,6 @@ function renderViewer(raw: string) {
     showToast('JSON copied!');
   });
 
-  document.getElementById('btn-copy-raw-url')!.addEventListener('click', async () => {
-    await navigator.clipboard.writeText(rawUrl);
-    showToast('Raw JSON URL copied!');
-  });
 }
 
 function showToast(msg: string) {
