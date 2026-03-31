@@ -1,5 +1,5 @@
 import type { ApiMatchResult, ApiScheduleItem, EventsDict } from '../types/api';
-import { PHASE_LABELS } from '../types/filters';
+import { PHASE_LABELS } from '../constants';
 import { getGender, getPhase } from './matchCode';
 
 function cityFromLocation(location: string): string {

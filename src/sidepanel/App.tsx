@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOlympicsData } from '../hooks/useOlympicsData';
 import { useMatchResults } from '../hooks/useMatchResults';
-import { DEFAULT_FILTERS } from '../types/filters';
+import { DEFAULT_FILTERS } from '../constants';
 import type { Filters } from '../types/filters';
 import { getGender, getPhase } from '../utils/matchCode';
 import FootballIcon from './FootballIcon';

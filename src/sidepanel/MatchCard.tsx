@@ -1,6 +1,6 @@
 import type { ApiMatchResult, ApiScheduleItem, EventsDict, MatchScore } from '../types/api';
 import { getGender, getPhase } from '../utils/matchCode';
-import { PHASE_LABELS } from '../types/filters';
+import { PHASE_LABELS } from '../constants';
 import { formatDate, getPhaseLabelFromEvents } from '../utils/helpers';
 import MatchMenu from './MatchMenu';
 

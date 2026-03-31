@@ -1,13 +1,4 @@
-export type Gender = 'M' | 'W';
-
-export type Phase =
-  | 'GPA'
-  | 'GPB'
-  | 'GPC'
-  | 'GPD'
-  | 'QFNL'
-  | 'SFNL'
-  | 'FNL';
+import type { Phase, Filters } from './types/filters';
 
 export const PHASE_LABELS: Record<Phase, string> = {
   GPA:  'Group A',
@@ -18,11 +9,6 @@ export const PHASE_LABELS: Record<Phase, string> = {
   SFNL: 'Semi-finals',
   FNL:  'Final',
 };
-
-export interface Filters {
-  genders: Gender[];
-  phases: Phase[];
-}
 
 export const DEFAULT_FILTERS: Filters = {
   genders: ['M', 'W'],
