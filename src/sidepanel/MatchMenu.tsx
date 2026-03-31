@@ -14,6 +14,7 @@ interface Props {
 export default function MatchMenu({ match, rawResult, events, reloadMatch }: Props) {
   const [open, setOpen] = useState(false);
   const [reloaded, setReloaded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function MatchMenu({ match, rawResult, events, reloadMatch }: Pro
       </button>
 
       {reloaded && <span className="match-menu-toast">Reloaded!</span>}
+      {copied && <span className="match-menu-toast">Copied!</span>}
 
       {open && (
         <div className="match-menu-dropdown">
@@ -67,10 +69,20 @@ export default function MatchMenu({ match, rawResult, events, reloadMatch }: Pro
             setReloaded(true);
             setTimeout(() => setReloaded(false), 2000);
           }}>
-            Load data
+            Reload data
           </button>
           <button className="match-menu-item" onClick={handleExport} disabled={!rawResult}>
             {rawResult ? 'Export JSON' : 'Loading…'}
+          </button>
+          <button className="match-menu-item" disabled={!rawResult} onClick={async () => {
+            const data = buildData();
+            if (!data) return;
+            await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+            setOpen(false);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }}>
+            {rawResult ? 'Copy JSON' : 'Loading…'}
           </button>
           <button className="match-menu-item" onClick={handleOpenInTab} disabled={!rawResult}>
             {rawResult ? 'Open in new tab' : 'Loading…'}
