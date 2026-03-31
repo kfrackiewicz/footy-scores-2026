@@ -1,6 +1,10 @@
+import { useOlympicsData } from '../hooks/useOlympicsData';
 import FootballIcon from './FootballIcon';
+import MatchList from './MatchList';
 
 export default function App() {
+  const { matches, events, loading, error } = useOlympicsData();
+
   return (
     <div className="app">
       <header className="header">
@@ -12,7 +16,11 @@ export default function App() {
       </header>
 
       <main className="main">
-        <p className="placeholder">Wyniki meczów pojawią się tutaj...</p>
+        {loading && <p className="state-msg">Ładowanie meczów...</p>}
+        {error   && <p className="state-msg state-msg--error">{error}</p>}
+        {!loading && !error && (
+          <MatchList matches={matches} events={events} />
+        )}
       </main>
     </div>
   );
