@@ -28,7 +28,7 @@ export default function App() {
         <FootballIcon size={48} />
         <div className="header-text">
           <h1 className="title">Footy Scores</h1>
-          <span className="subtitle">Paris 2024 &amp; Beyond</span>
+          <span className="subtitle">Paris 2024</span>
         </div>
       </header>
 
