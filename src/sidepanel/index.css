@@ -251,6 +251,29 @@ body {
   color: #fff;
 }
 
+.match-menu-toast {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #009F3D;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 300;
+  pointer-events: none;
+  animation: fadeInOut 2.5s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .match-menu-dropdown {
   position: absolute;
   right: 0;
