@@ -83,20 +83,22 @@ export function buildExportJson(
   const eventCode  = match.code.slice(0, 22);
   const event      = events[eventCode];
 
-  // Scorers from playByPlay (action SHOT, result GOAL)
+  // Scorers from playByPlay (SHOT/GOAL = open play, FRD/GOAL = free kick)
   const scorers = (result.playByPlay ?? []).flatMap((period) =>
     (period.actions ?? [])
-      .filter((a) => a.pbpa_Action === 'SHOT' && a.pbpa_Result === 'GOAL')
+      .filter((a) => (a.pbpa_Action === 'SHOT' || a.pbpa_Action === 'FRD') && a.pbpa_Result === 'GOAL')
       .map((a) => {
         const competitor = a.competitors?.[0];
-        const scorer  = competitor?.athletes?.find((at) => at.pbpat_role === 'SCR');
-        const assister = competitor?.athletes?.find((at) => at.pbpat_role === 'AST');
+        const scorer   = competitor?.athletes?.find((at) => at.pbpat_role === 'SCR');
+        const assister = competitor?.athletes?.find((at) => at.pbpat_role === 'ASSIST');
+        const minute   = a.pbpa_When ? parseInt(a.pbpa_When, 10) : null;
+        const type     = a.pbpa_Action === 'FRD' ? 'free_kick' : 'open_play';
         return {
           team: teamNameByCode(competitor?.pbpc_code ?? '', result),
           player: scorer ? athleteNameByCode(scorer.pbpat_code, result) : null,
-          minute: a.pbpa_When ?? null,
+          minute,
           ...(assister ? { assist: athleteNameByCode(assister.pbpat_code, result) } : {}),
-          type: 'open_play',
+          type,
         };
       }),
   );

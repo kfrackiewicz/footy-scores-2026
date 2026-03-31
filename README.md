@@ -59,7 +59,7 @@ To reload after a rebuild: click the refresh icon (↺) on the extension card in
   "teams": { "home": "France", "away": "Spain" },
   "score": { "home": 2, "away": 1, "halfTime": { "home": 1, "away": 0 } },
   "scorers": [
-    { "team": "France", "player": "Jean Dupont", "minute": "23'", "type": "open_play" }
+    { "team": "France", "player": "Jean Dupont", "minute": 23, "type": "open_play" }
   ],
   "lineups": {
     "home": { "team": "France", "formation": "4-3-3", "coach": "Thierry Henry", "startingXI": [...], "bench": [...] },
@@ -67,6 +67,10 @@ To reload after a rebuild: click the refresh icon (↺) on the extension card in
   }
 }
 ```
+
+### Match ordering
+
+Matches are sorted by `startDate` ascending (earliest kickoff first). This order is applied at fetch time in `useOlympicsData.ts` and is stable given the same source data.
 
 ## Data sources
 
@@ -77,6 +81,14 @@ To reload after a rebuild: click the refresh icon (↺) on the extension card in
 | `RES_ByRSC_H2H~...~rscResult={matchCode}` | Match result (scores, lineups, goals) |
 
 All endpoints from `stacy.olympics.com/OG2024/data/`.
+
+## Assumptions
+
+- **Match identification** — a schedule entry is treated as a football match if it has at least two `start` entries (home and away participants). Entries with fewer than two participants are skipped.
+- **Goal types** — the source play-by-play data uses two action codes for goals: `SHOT` (mapped to `open_play`) and `FRD` (mapped to `free_kick`). There is no further sub-type in the data, so headers, penalties, and own goals cannot be distinguished; they fall under `open_play` or `free_kick` accordingly.
+- **Scorer minutes** — kick-off minute is taken from the `pbpa_When` field (e.g. `"23'"`), parsed to an integer. Extra-time and penalty-shootout minutes (e.g. `"90+2'"`) are parsed as the base minute only.
+- **Missing results** — matches with status other than `FINISHED` have no result data; score, scorers, and lineups are `null` in the export.
+- **Venue city** — extracted from the `location.description` field by taking the text after the last comma (e.g. `"Parc des Princes, Paris"` → `"Paris"`). If no comma is present, the full string is used.
 
 ## Project structure
 
