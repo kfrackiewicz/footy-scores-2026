@@ -1,42 +1,74 @@
 // ---------------------------------------------------------------------------
-// SEL_Events — słownik kategorii (men/women itp.)
-// Dostosuj nazwy pól do rzeczywistej odpowiedzi API
+// SEL_Events — category dictionary (men/women etc.)
+// Top-level key: "events"
 // ---------------------------------------------------------------------------
+export interface ApiEventPhase {
+  code: string;
+  description: string;
+  shortDescription: string;
+  type: string;
+  order?: string;
+}
+
 export interface ApiEvent {
-  code: string;         // np. "FBL-M-TEAM-TEM"
-  gender: string;       // np. "M" | "W"
-  description: string;  // np. "Men's Football"
+  code: string;
+  description: string;
+  longDescription: string;
+  isTeam: boolean;
+  phases: ApiEventPhase[];
 }
 
 export interface EventsResponse {
   events: ApiEvent[];
 }
 
-// Słownik code → ApiEvent, budowany po zaciągnięciu eventsUrl
+// Keyed by trimmed event code (22-char prefix of match code)
 export type EventsDict = Record<string, ApiEvent>;
 
 // ---------------------------------------------------------------------------
-// SCH_StartList — terminarz meczów
-// Dostosuj nazwy pól do rzeczywistej odpowiedzi API
+// SCH_StartList — match schedule
+// Top-level key: "schedules"
 // ---------------------------------------------------------------------------
-export interface ApiCompetitor {
-  noc: string;          // kod kraju, np. "FRA"
-  name: string;         // np. "France"
-  order: number;        // 1 = home, 2 = away
-  results?: {
-    score?: string;
+export interface ApiParticipant {
+  code: string;
+  name: string;
+  shortName: string;
+  organisation: {
+    code: string;       // country code, e.g. "ESP"
+    description: string;
   };
 }
 
-export interface ApiUnit {
-  code: string;                // unikalny kod meczu
-  eventCode: string;           // klucz do EventsDict
-  startDate: string;           // ISO 8601
-  venue?: { description: string };
-  status?: { code: string };   // np. "FINISHED" | "SCHEDULED" | "RUNNING"
-  competitors: ApiCompetitor[];
+export interface ApiStartEntry {
+  sortOrder: number;    // 1 = home, 2 = away
+  startOrder: number;
+  teamCode: string;
+  participant: ApiParticipant;
+}
+
+export interface ApiScheduleItem {
+  code: string;         // e.g. "FBLWTEAM11------------GPC-000100--"
+  startDate: string;    // ISO 8601
+  endDate: string;
+  status: {
+    code: string;       // "FINISHED" | "SCHEDULED" | "RUNNING"
+    description: string;
+  };
+  venue: {
+    description: string;
+  };
+  location: {
+    description: string;
+  };
+  start: ApiStartEntry[];
+  result: {
+    status: {
+      code: string;     // "OFFICIAL" | ...
+      description: string;
+    };
+  };
 }
 
 export interface ScheduleResponse {
-  units: ApiUnit[];
+  schedules: ApiScheduleItem[];
 }

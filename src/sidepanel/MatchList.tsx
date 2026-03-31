@@ -1,8 +1,8 @@
-import type { ApiUnit, EventsDict } from '../types/api';
+import type { ApiScheduleItem, EventsDict } from '../types/api';
 import MatchCard from './MatchCard';
 
 interface Props {
-  matches: ApiUnit[];
+  matches: ApiScheduleItem[];
   events: EventsDict;
 }
 
@@ -14,7 +14,7 @@ export default function MatchList({ matches, events }: Props) {
   return (
     <ul className="match-list">
       {matches.map((match) => (
-        <MatchCard key={match.code} match={match} event={events[match.eventCode]} />
+        <MatchCard key={match.code} match={match} events={events} />
       ))}
     </ul>
   );

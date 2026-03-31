@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { API } from '../config/endpoints';
-import type { ApiEvent, ApiUnit, EventsDict } from '../types/api';
+import type { ApiScheduleItem, EventsDict, EventsResponse, ScheduleResponse } from '../types/api';
 
 interface State {
-  matches: ApiUnit[];
+  matches: ApiScheduleItem[];
   events: EventsDict;
   loading: boolean;
   error: string | null;
@@ -30,21 +30,17 @@ export function useOlympicsData() {
         if (!scheduleRes.ok) throw new Error(`Schedule fetch failed: ${scheduleRes.status}`);
         if (!eventsRes.ok)   throw new Error(`Events fetch failed: ${eventsRes.status}`);
 
-        const [schedule, eventsData] = await Promise.all([
+        const [schedule, eventsData]: [ScheduleResponse, EventsResponse] = await Promise.all([
           scheduleRes.json(),
           eventsRes.json(),
         ]);
 
-        console.log('RAW schedule:', schedule);
-        console.log('RAW events:', eventsData);
-
-        // TODO: zaktualizuj po zobaczeniu RAW logów w konsoli
+        // Key events by their 22-char code (matches the prefix of schedule item codes)
         const eventsDict: EventsDict = Object.fromEntries(
-          (eventsData.events ?? []).map((e: ApiEvent) => [e.code, e]),
+          eventsData.events.map((e) => [e.code, e]),
         );
 
-        const units: ApiUnit[] = schedule.units ?? [];
-        const sorted = [...units].sort(
+        const sorted = [...schedule.schedules].sort(
           (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
         );
 

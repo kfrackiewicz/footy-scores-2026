@@ -140,7 +140,23 @@ body {
   white-space: nowrap;
 }
 
-.match-venue {
+.match-footer {
+  display: flex;
+  justify-content: space-between;
   font-size: 0.68rem;
   color: var(--text-muted);
 }
+
+.match-venue {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.match-status {
+  font-weight: 600;
+}
+
+.match-status--finished  { color: var(--text-muted); }
+.match-status--scheduled { color: #0085C7; }
+.match-status--running   { color: #009F3D; }
