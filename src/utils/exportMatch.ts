@@ -25,11 +25,14 @@ function teamNameByCode(teamCode: string, result: ApiMatchResult): string {
 
 function buildLineup(item: ApiMatchResult['items'][number]) {
   const headCoach = item.teamCoaches?.find(
-    (c) => c.function.functionCode === 'COA',
+    (c) => c.function.functionCode === 'COACH',
   );
   const coach = headCoach?.coach
     ? `${headCoach.coach.givenName} ${headCoach.coach.familyName}`
     : null;
+
+  const formation =
+    item.eventUnitEntries?.find((e) => e.eue_code === 'FORMATION')?.eue_value ?? null;
 
   const starters = (item.teamAthletes ?? []).filter((a) =>
     a.eventUnitEntries?.some(
@@ -57,7 +60,7 @@ function buildLineup(item: ApiMatchResult['items'][number]) {
 
   return {
     team: item.participant?.name ?? '',
-    formation: null,
+    formation,
     coach,
     startingXI: starters.map(mapAthlete),
     bench: bench.map(mapAthlete),

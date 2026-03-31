@@ -93,6 +93,11 @@ export interface ApiResultItem {
       nationality?: { code: string };
     };
   }>;
+  eventUnitEntries?: Array<{
+    eue_code: string;
+    eue_value: string;
+    eue_type?: string;
+  }>;
   teamAthletes?: Array<{
     order: number;
     bib: string;
