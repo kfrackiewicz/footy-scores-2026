@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { API } from '../config/endpoints';
 import type { ApiMatchResult, ResultResponse, ResultsDict } from '../types/api';
 
@@ -26,6 +26,23 @@ export function useMatchResults(): Return {
 
   // tracks codes that have already been requested to prevent duplicate fetches
   const requestedRef = useRef(new Set<string>());
+  // mirrors failedCodes state so the online handler can read it without stale closure
+  const failedCodesRef = useRef(new Set<string>());
+
+  useEffect(() => {
+    failedCodesRef.current = state.failedCodes;
+  }, [state.failedCodes]);
+
+  useEffect(() => {
+    function handleOnline() {
+      const toRetry = [...failedCodesRef.current];
+      if (toRetry.length === 0) return;
+      toRetry.forEach((code) => requestedRef.current.delete(code));
+      toRetry.forEach((code) => loadMatch(code));
+    }
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
 
   function fetchResult(code: string): Promise<boolean> {
     setState((prev) => ({ ...prev, reloadingCodes: new Set([...prev.reloadingCodes, code]) }));
